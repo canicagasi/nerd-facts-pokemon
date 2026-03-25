@@ -95,7 +95,7 @@ For MacOS & Linux: source .venv/bin/activate
 For Windows: .venv\Scripts\activate
 
 # 3. Install Evidence dependencies (first time only)
-cd evidence && npm install && cd ..
+make deps
 
 # 4. Run the full pipeline: extract → transform → test → sync
 make all
