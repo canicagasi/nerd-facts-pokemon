@@ -11,6 +11,9 @@ help: ## Show available commands
 
 all: extract transform test sync-evidence evidence-dev ## Full pipeline
 
+deps: ## Install Evidence dependencies (first time only)
+	cd evidence && npm install && cd ..
+
 extract: ## Extract from PokeAPI via dlt
 	@mkdir -p data
 	cd extract && uv run python pokemon_pipeline.py
