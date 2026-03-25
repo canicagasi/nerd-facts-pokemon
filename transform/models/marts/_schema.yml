@@ -1,0 +1,146 @@
+version: 2
+
+models:
+  - name: dim_pokemon
+    description: >
+      Pokemon dimension — one row per Pokemon. Contains physical attributes,
+      primary/secondary type, generation, and derived fields like BMI and
+      type combo string. This is the central dimension in the star schema.
+    columns:
+      - name: pokemon_id
+        description: "PokeAPI Pokemon ID (Pokedex number)"
+        tests:
+          - unique
+          - not_null
+      - name: primary_type
+        description: "The Pokemon's primary type (e.g. fire, water)"
+      - name: generation_id
+        description: "FK to dim_generation"
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_generation')
+                field: generation_id
+
+  - name: dim_type
+    description: >
+      Type dimension — one row per Pokemon type. Includes offensive and
+      defensive profile summaries (count of super-effective matchups,
+      weaknesses, resistances, and immunities).
+    columns:
+      - name: type_id
+        description: "PokeAPI type ID"
+        tests:
+          - unique
+          - not_null
+      - name: net_type_advantage
+        description: "super_effective_against_count minus weak_to_count — higher is better"
+
+  - name: dim_generation
+    description: >
+      Generation dimension — one row per game generation with region name
+      and count of species introduced.
+    columns:
+      - name: generation_id
+        description: "PokeAPI generation ID"
+        tests:
+          - unique
+          - not_null
+
+  - name: bridge_pokemon_types
+    description: >
+      Bridge table resolving the many-to-many relationship between Pokemon
+      and Types. Each Pokemon has 1-2 type assignments.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - pokemon_id
+              - type_id
+    columns:
+      - name: pokemon_id
+        description: "FK to dim_pokemon"
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_pokemon')
+                field: pokemon_id
+      - name: type_id
+        description: "FK to dim_type"
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_type')
+                field: type_id
+
+  - name: fct_pokemon_stats
+    description: >
+      Pokemon stats fact — one row per Pokemon with all six base stats
+      pivoted into columns, plus derived base_stat_total, stat_archetype,
+      and offensive_ratio.
+    columns:
+      - name: pokemon_id
+        description: "FK to dim_pokemon"
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_pokemon')
+                field: pokemon_id
+      - name: base_stat_total
+        description: "Sum of all six base stats — the standard BST metric"
+      - name: stat_archetype
+        description: "Classification based on highest stat (physical attacker, speedster, etc.)"
+        tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - physical attacker
+                  - special attacker
+                  - physical tank
+                  - special tank
+                  - speedster
+                  - hp wall
+                  - balanced
+
+  - name: fct_type_effectiveness
+    description: >
+      Type effectiveness fact — one row per non-neutral type matchup.
+      Contains the multiplier (2.0, 0.5, 0.0) and human-readable label.
+      Neutral (1.0x) matchups are absent and can be inferred.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - attacking_type_id
+              - defending_type_id
+    columns:
+      - name: attacking_type_id
+        description: "FK to dim_type (attacker)"
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_type')
+                field: type_id
+      - name: defending_type_id
+        description: "FK to dim_type (defender)"
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_type')
+                field: type_id
+      - name: effectiveness_label
+        description: "Human-readable label for the multiplier"
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - super effective
+                  - not very effective
+                  - no effect

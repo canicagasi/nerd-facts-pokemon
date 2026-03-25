@@ -1,0 +1,28 @@
+# Data
+data/*.duckdb
+data/*.duckdb.wal
+
+# dlt
+extract/.dlt/secrets.toml
+extract/.dlt/pipelines/
+extract/pokemon/
+
+# dbt
+transform/target/
+transform/dbt_packages/
+transform/logs/
+
+# Evidence
+evidence/node_modules/
+evidence/.evidence/
+evidence/build/
+evidence/sources/pokemon/nerd_facts.duckdb
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
+extract/pokemon.duckdb
+
+.vscode/

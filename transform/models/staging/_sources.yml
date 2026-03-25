@@ -1,0 +1,35 @@
+version: 2
+
+sources:
+  - name: pokemon
+    description: "Raw Pokemon data extracted from PokeAPI via dlt"
+    schema: pokemon
+    tables:
+      - name: pokemon
+        description: "Base Pokemon data — one row per Pokemon"
+      - name: pokemon__stats
+        description: "Pokemon base stats (hp, attack, defense, etc.)"
+      - name: pokemon__types
+        description: "Pokemon type assignments (primary/secondary)"
+      - name: pokemon__abilities
+        description: "Pokemon abilities"
+      - name: generations
+        description: "Game generations with region info"
+      - name: generations__pokemon_species
+        description: "Pokemon species belonging to each generation"
+      - name: pokemon_species
+        description: "Pokemon species flavor text from Pokedex (Yellow version, English)"
+      - name: types
+        description: "Pokemon types with damage relation metadata"
+      - name: types__double_damage_to
+        description: "Types that this type deals double damage to"
+      - name: types__double_damage_from
+        description: "Types that deal double damage to this type"
+      - name: types__half_damage_to
+        description: "Types that this type deals half damage to"
+      - name: types__half_damage_from
+        description: "Types that deal half damage to this type"
+      - name: types__no_damage_to
+        description: "Types immune to this type's attacks"
+      - name: types__no_damage_from
+        description: "Types whose attacks this type is immune to"

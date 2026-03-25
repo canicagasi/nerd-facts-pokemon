@@ -1,0 +1,3 @@
+[sources.pokeapi]
+base_url = "https://pokeapi.co/api/v2"
+pokemon_limit = 151

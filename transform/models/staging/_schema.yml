@@ -1,0 +1,100 @@
+version: 2
+
+models:
+  - name: stg_pokemon
+    description: "Staged Pokemon — one row per Pokemon with renamed and converted columns"
+    columns:
+      - name: pokemon_id
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_pokemon_types
+    description: "Staged Pokemon type assignments — one row per Pokemon–type slot"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - pokemon_id
+              - type_slot
+    columns:
+      - name: pokemon_id
+        tests:
+          - not_null
+      - name: type_slot
+        tests:
+          - not_null
+
+  - name: stg_pokemon_stats
+    description: "Staged Pokemon base stats — one row per Pokemon–stat combination"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - pokemon_id
+              - stat_name
+    columns:
+      - name: pokemon_id
+        tests:
+          - not_null
+      - name: stat_name
+        tests:
+          - not_null
+
+  - name: stg_pokemon_abilities
+    description: "Staged Pokemon abilities — one row per Pokemon–ability assignment"
+    columns:
+      - name: pokemon_id
+        tests:
+          - not_null
+
+  - name: stg_pokemon_species
+    description: "Staged Pokemon species — one row per Pokemon with Pokedex flavor text"
+    columns:
+      - name: pokemon_id
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_generations
+    description: "Staged generations — one row per game generation"
+    columns:
+      - name: generation_id
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_generation_species
+    description: "Staged generation–species mapping — one row per Pokemon–generation assignment"
+    columns:
+      - name: generation_id
+        tests:
+          - not_null
+      - name: pokemon_name
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_types
+    description: "Staged types — one row per Pokemon type"
+    columns:
+      - name: type_id
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_type_effectiveness
+    description: "Staged type effectiveness — one row per attacking–defending type matchup (non-neutral only)"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - attacking_type
+              - defending_type
+    columns:
+      - name: attacking_type
+        tests:
+          - not_null
+      - name: defending_type
+        tests:
+          - not_null

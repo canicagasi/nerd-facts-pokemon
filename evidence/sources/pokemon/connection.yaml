@@ -1,0 +1,4 @@
+name: pokemon
+type: duckdb
+options:
+  filename: nerd_facts.duckdb
